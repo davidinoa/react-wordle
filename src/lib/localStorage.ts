@@ -1,4 +1,49 @@
+const gameStateKey = 'gameState'
+const archiveGameStateKey = 'archiveGameState'
 const highContrastKey = 'highContrast'
+
+export type StoredGameState = {
+  guesses: string[]
+  solution: string
+}
+
+export const saveGameStateToLocalStorage = (
+  isLatestGame: boolean,
+  gameState: StoredGameState
+) => {
+  if (typeof window === 'undefined') return
+  const key = isLatestGame ? gameStateKey : archiveGameStateKey
+  localStorage.setItem(key, JSON.stringify(gameState))
+}
+
+export const loadGameStateFromLocalStorage = (isLatestGame: boolean) => {
+  if (typeof window === 'undefined') return
+  const key = isLatestGame ? gameStateKey : archiveGameStateKey
+  const state = localStorage.getItem(key)
+  return state ? (JSON.parse(state) as StoredGameState) : null
+}
+
+const gameStatKey = 'gameStats'
+
+export type GameStats = {
+  winDistribution: number[]
+  gamesFailed: number
+  currentStreak: number
+  bestStreak: number
+  totalGames: number
+  successRate: number
+}
+
+export const saveStatsToLocalStorage = (gameStats: GameStats) => {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(gameStatKey, JSON.stringify(gameStats))
+}
+
+export const loadStatsFromLocalStorage = () => {
+  if (typeof window === 'undefined') return
+  const stats = localStorage.getItem(gameStatKey)
+  return stats ? (JSON.parse(stats) as GameStats) : null
+}
 
 export const setStoredIsHighContrastMode = (isHighContrast: boolean) => {
   if (typeof window === 'undefined') return
