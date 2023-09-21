@@ -11,10 +11,56 @@ import queryString from 'query-string'
 import { ENABLE_ARCHIVED_GAMES } from '../constants/settings'
 import { WORDS } from '../constants/wordlist'
 import { getToday } from './dateutils'
+import { VALID_GUESSES } from '@/constants/validGuesses'
+import { getGuessStatuses } from './statuses'
+import { NOT_CONTAINED_MESSAGE, WRONG_SPOT_MESSAGE } from '@/constants/strings'
 
 // 1 January 2022 Game Epoch
 export const firstGameDate = new Date(2022, 0)
 export const periodInDays = 1
+
+export const isWordInWordList = (word: string) => {
+  return (
+    WORDS.includes(localeAwareLowerCase(word)) ||
+    VALID_GUESSES.includes(localeAwareLowerCase(word))
+  )
+}
+
+export const findFirstUnusedReveal = (word: string, guesses: string[]) => {
+  if (guesses.length === 0) {
+    return false
+  }
+
+  const lettersLeftArray = new Array<string>()
+  const guess = guesses[guesses.length - 1]
+  const statuses = getGuessStatuses(solution, guess)
+  const splitWord = unicodeSplit(word)
+  const splitGuess = unicodeSplit(guess)
+
+  for (let i = 0; i < splitGuess.length; i++) {
+    if (statuses[i] === 'correct' || statuses[i] === 'present') {
+      lettersLeftArray.push(splitGuess[i])
+    }
+    if (statuses[i] === 'correct' && splitWord[i] !== splitGuess[i]) {
+      return WRONG_SPOT_MESSAGE(splitGuess[i], i + 1)
+    }
+  }
+
+  // check for the first unused letter, taking duplicate letters
+  // into account
+  let n
+  for (const letter of splitWord) {
+    n = lettersLeftArray.indexOf(letter)
+    if (n !== -1) {
+      lettersLeftArray.splice(n, 1)
+    }
+  }
+
+  if (lettersLeftArray.length > 0) {
+    return NOT_CONTAINED_MESSAGE(lettersLeftArray[0])
+  }
+  return false
+}
 
 export const unicodeSplit = (word: string) => {
   return new GraphemeSplitter().splitGraphemes(word)
@@ -101,6 +147,10 @@ export const getGameDate = () => {
     console.log(e)
     return getToday()
   }
+}
+
+export const isWinningWord = (word: string) => {
+  return solution === word
 }
 
 export const setGameDate = (d: Date) => {
