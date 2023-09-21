@@ -27,7 +27,8 @@ export default function Home() {
   const isLatestGame = getIsLatestGame()
   const gameDate = getGameDate()
   const prefersDarkMode =
-    window && window.matchMedia('(prefers-color-scheme: dark)').matches
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert()
   const [currentGuess, setCurrentGuess] = useState('')
