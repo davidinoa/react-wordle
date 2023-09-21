@@ -24,10 +24,11 @@ import { useAlert } from '@/context/AlertContext'
 import { loadGameStateFromLocalStorage } from '@/lib/localStorage'
 
 export default function Home() {
+  const isBrowserRuntime = typeof window !== 'undefined'
   const isLatestGame = getIsLatestGame()
   const gameDate = getGameDate()
   const prefersDarkMode =
-    typeof window !== 'undefined' &&
+    isBrowserRuntime &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert()
@@ -54,11 +55,12 @@ export default function Home() {
     return loaded.guesses
   })
 
-  const [isHardMode, setIsHardMode] = useState(
-    localStorage.getItem('gameMode')
+  const [isHardMode, setIsHardMode] = useState(() => {
+    if (!isBrowserRuntime) return
+    return localStorage.getItem('gameMode')
       ? localStorage.getItem('gameMode') === 'hard'
       : false
-  )
+  })
   const [stats, setStats] = useState(() => loadStats())
 
   const clearCurrentRowClass = () => {
