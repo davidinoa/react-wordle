@@ -1,9 +1,10 @@
 'use client'
 import { useState } from 'react'
+import Div100vh from 'react-div-100vh'
 import { Grid } from '@/components/grid/Grid'
 import { Keyboard } from '@/components/keyboard/Keyboard'
 import { MAX_CHALLENGES, REVEAL_TIME_MS } from '@/constants/settings'
-import { WORDS } from '@/constants/wordlist'
+
 import {
   findFirstUnusedReveal,
   getGameDate,
@@ -22,6 +23,7 @@ import {
 } from '@/constants/strings'
 import { useAlert } from '@/context/AlertContext'
 import { loadGameStateFromLocalStorage } from '@/lib/localStorage'
+import { Navbar } from '@/components/navbar/Navbar'
 
 export default function Home() {
   const isBrowserRuntime = typeof window !== 'undefined'
@@ -62,6 +64,11 @@ export default function Home() {
       : false
   })
   const [stats, setStats] = useState(() => loadStats())
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false)
+  const [isDatePickerModalOpen, setIsDatePickerModalOpen] = useState(false)
+  const [isMigrateStatsModalOpen, setIsMigrateStatsModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
 
   const clearCurrentRowClass = () => {
     setCurrentRowClass('')
@@ -151,22 +158,34 @@ export default function Home() {
   }
 
   return (
-    <main>
-      <Grid
-        solution={solution}
-        guesses={guesses}
-        currentGuess={currentGuess}
-        isRevealing={isRevealing}
-        currentRowClassName={currentRowClass}
-      />
-      <Keyboard
-        onChar={onChar}
-        onDelete={onDelete}
-        onEnter={onEnter}
-        solution={solution}
-        guesses={guesses}
-        isRevealing={isRevealing}
-      />
-    </main>
+    <Div100vh>
+      <div className="flex h-full flex-col">
+        <Navbar
+          setIsInfoModalOpen={setIsInfoModalOpen}
+          setIsStatsModalOpen={setIsStatsModalOpen}
+          setIsDatePickerModalOpen={setIsDatePickerModalOpen}
+          setIsSettingsModalOpen={setIsSettingsModalOpen}
+        />
+        <div className="mx-auto flex w-full grow flex-col px-1 pt-2 pb-8 sm:px-6 md:max-w-7xl lg:px-8 short:pb-2 short:pt-2">
+          <main className="flex grow flex-col justify-center pb-6 short:pb-2">
+            <Grid
+              solution={solution}
+              guesses={guesses}
+              currentGuess={currentGuess}
+              isRevealing={isRevealing}
+              currentRowClassName={currentRowClass}
+            />
+          </main>
+          <Keyboard
+            onChar={onChar}
+            onDelete={onDelete}
+            onEnter={onEnter}
+            solution={solution}
+            guesses={guesses}
+            isRevealing={isRevealing}
+          />
+        </div>
+      </div>
+    </Div100vh>
   )
 }
