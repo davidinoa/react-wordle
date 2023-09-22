@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import Div100vh from 'react-div-100vh'
 
@@ -139,11 +140,13 @@ export default function Home() {
   }, [isDarkMode, isHighContrastMode])
 
   const handleDarkMode = (isDark: boolean) => {
+    if (!isBrowserRuntime()) return
     setIsDarkMode(isDark)
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
   }
 
   const handleHardMode = (isHard: boolean) => {
+    if (!isBrowserRuntime()) return
     if (guesses.length === 0 || localStorage.getItem('gameMode') === 'hard') {
       setIsHardMode(isHard)
       localStorage.setItem('gameMode', isHard ? 'hard' : 'normal')
