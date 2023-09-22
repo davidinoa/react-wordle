@@ -18,5 +18,5 @@ export const isInAppBrowser = () => {
 }
 
 export const isBrowserRuntime = () => {
-  return typeof window !== undefined
+  return typeof window !== 'undefined'
 }
