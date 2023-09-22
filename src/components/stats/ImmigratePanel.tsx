@@ -1,4 +1,4 @@
-import { SaveIcon } from '@heroicons/react/outline'
+import { ArrowDownOnSquareIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 
 import { decrypt } from '../../lib/encryption'
@@ -101,7 +101,7 @@ export const ImmigratePanel = () => {
           disabled:bg-white disabled:text-gray-900 disabled:focus:outline-none disabled:dark:border-gray-600 disabled:dark:bg-gray-800 disabled:dark:text-gray-400 sm:text-sm"
       >
         {isSaveButtonEnabled && (
-          <SaveIcon className="mr-2 h-6 w-6 cursor-pointer dark:stroke-white" />
+          <ArrowDownOnSquareIcon className="mr-2 h-6 w-6 cursor-pointer dark:stroke-white" />
         )}
         Save
       </button>

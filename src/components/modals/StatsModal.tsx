@@ -1,4 +1,4 @@
-import { ClockIcon, ShareIcon } from '@heroicons/react/outline'
+import { ClockIcon, ShareIcon } from '@heroicons/react/24/outline'
 import { format } from 'date-fns'
 import Countdown from 'react-countdown'
 

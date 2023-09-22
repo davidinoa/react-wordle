@@ -1,4 +1,4 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { addDays, format, startOfDay } from 'date-fns'
 import { useState } from 'react'
 import DatePicker, { registerLocale } from 'react-datepicker'
