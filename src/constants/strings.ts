@@ -1,7 +1,11 @@
+export const ARCHIVE_GAMEDATE_TEXT = 'Game date'
+export const BEST_STREAK_TEXT = 'Best streak'
 export const CORRECT_WORD_MESSAGE = (solution: string) =>
   `The word was ${solution}`
-export const BEST_STREAK_TEXT = 'Best streak'
 export const CURRENT_STREAK_TEXT = 'Current streak'
+export const DATEPICKER_CHOOSE_TEXT = 'Choose'
+export const DATEPICKER_TITLE = 'Choose a past date'
+export const DATEPICKER_TODAY_TEXT = 'today'
 export const DELETE_TEXT = 'Delete'
 export const ENTER_TEXT = 'Enter'
 export const NOT_CONTAINED_MESSAGE = (letter: string) =>

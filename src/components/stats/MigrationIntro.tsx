@@ -11,7 +11,7 @@ type Props = {
 
 export const MigrationIntro = ({ handleMigrateStatsButton }: Props) => {
   return (
-    <div className="mt-5 columns-2 items-center items-stretch justify-center text-center dark:text-white sm:mt-6">
+    <div className="mt-5 columns-2 items-stretch justify-center text-center dark:text-white sm:mt-6">
       <div className="mt-3 text-xs">{MIGRATE_DESCRIPTION_TEXT}</div>
       <button
         type="button"
