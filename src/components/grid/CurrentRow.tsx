@@ -4,16 +4,15 @@ import { Cell } from './Cell'
 type Props = {
   guess: string
   className: string
-  onAnimationEnd: () => void
 }
 
-export const CurrentRow = ({ guess, className, onAnimationEnd }: Props) => {
+export const CurrentRow = ({ guess, className }: Props) => {
   const splitGuess = unicodeSplit(guess)
   const emptyCells = Array.from(Array(solution.length - splitGuess.length))
   const classes = `flex justify-center mb-1 ${className}`
 
   return (
-    <div className={classes} onAnimationEnd={onAnimationEnd}>
+    <div className={classes}>
       {splitGuess.map((letter, i) => (
         <Cell key={i} value={letter} />
       ))}

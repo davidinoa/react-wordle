@@ -31,7 +31,7 @@ export const SHARE_TEXT = 'Share'
 export const STATISTICS_TITLE = 'Statistics'
 export const SUCCESS_RATE_TEXT = 'Success rate'
 export const TOTAL_TRIES_TEXT = 'Total tries'
-export const WIN_MESSAGES = ['Great Job!', 'Awesome!', 'Well done!']
-export const WORD_NOT_FOUND_MESSAGE = 'Word not foun. Try a new word.'
+export const WIN_MESSAGES = ['Great Job!', 'Awesome', 'Well done!']
+export const WORD_NOT_FOUND_MESSAGE = 'Word not found'
 export const WRONG_SPOT_MESSAGE = (guess: string, position: number) =>
   `Must use ${guess} in position ${position}`
