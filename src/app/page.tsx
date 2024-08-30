@@ -50,8 +50,10 @@ import { MigrateStatsModal } from '@/components/modals/MigrateStatsModal'
 import { SettingsModal } from '@/components/modals/SettingsModal'
 import { StatsModal } from '@/components/modals/StatsModal'
 import { isBrowserRuntime, isInAppBrowser } from '@/lib/browser'
+import { ClientGate } from '@/lib/ClientGate'
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false)
   const isLatestGame = getIsLatestGame()
   const gameDate = getGameDate()
   const prefersDarkMode =
@@ -187,6 +189,12 @@ export default function Home() {
     }
   }, [isGameWon, isGameLost, showSuccessAlert])
 
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) return null
+
   const onChar = (value: string) => {
     if (
       unicodeLength(`${currentGuess}${value}`) <= solution.length &&
@@ -271,86 +279,90 @@ export default function Home() {
   }
 
   return (
-    <Div100vh>
-      <div className="flex h-full flex-col">
-        <Navbar
-          setIsInfoModalOpen={setIsInfoModalOpen}
-          setIsStatsModalOpen={setIsStatsModalOpen}
-          setIsDatePickerModalOpen={setIsDatePickerModalOpen}
-          setIsSettingsModalOpen={setIsSettingsModalOpen}
-        />
-        <div className="mx-auto flex w-full grow flex-col px-1 pt-2 pb-8 sm:px-6 md:max-w-7xl lg:px-8 short:pb-2 short:pt-2">
-          <main className="flex grow flex-col justify-center pb-6 short:pb-2">
-            <Grid
+    <ClientGate>
+      <Div100vh>
+        <div className="flex h-full flex-col">
+          <Navbar
+            setIsInfoModalOpen={setIsInfoModalOpen}
+            setIsStatsModalOpen={setIsStatsModalOpen}
+            setIsDatePickerModalOpen={setIsDatePickerModalOpen}
+            setIsSettingsModalOpen={setIsSettingsModalOpen}
+          />
+          <div className="mx-auto flex w-full grow flex-col px-1 pt-2 pb-8 sm:px-6 md:max-w-7xl lg:px-8 short:pb-2 short:pt-2">
+            <main className="flex grow flex-col justify-center pb-6 short:pb-2">
+              <Grid
+                solution={solution}
+                guesses={guesses}
+                currentGuess={currentGuess}
+                isRevealing={isRevealing}
+                currentRowClassName={currentRowClass}
+              />
+            </main>
+            <Keyboard
+              onChar={onChar}
+              onDelete={onDelete}
+              onEnter={onEnter}
               solution={solution}
               guesses={guesses}
-              currentGuess={currentGuess}
               isRevealing={isRevealing}
-              currentRowClassName={currentRowClass}
             />
-          </main>
-          <Keyboard
-            onChar={onChar}
-            onDelete={onDelete}
-            onEnter={onEnter}
-            solution={solution}
-            guesses={guesses}
-            isRevealing={isRevealing}
-          />
-          <InfoModal
-            isOpen={isInfoModalOpen}
-            handleClose={() => setIsInfoModalOpen(false)}
-          />
-          <StatsModal
-            isOpen={isStatsModalOpen}
-            handleClose={() => setIsStatsModalOpen(false)}
-            solution={solution}
-            guesses={guesses}
-            gameStats={stats}
-            isLatestGame={isLatestGame}
-            isGameLost={isGameLost}
-            isGameWon={isGameWon}
-            handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}
-            handleShareFailure={() =>
-              showErrorAlert(SHARE_FAILURE_TEXT, {
-                durationMs: LONG_ALERT_TIME_MS,
-              })
-            }
-            handleMigrateStatsButton={() => {
-              setIsStatsModalOpen(false)
-              setIsMigrateStatsModalOpen(true)
-            }}
-            isHardMode={isHardMode}
-            isDarkMode={isDarkMode}
-            isHighContrastMode={isHighContrastMode}
-            numberOfGuessesMade={guesses.length}
-          />
-          <DatePickerModal
-            isOpen={isDatePickerModalOpen}
-            initialDate={solutionGameDate}
-            handleSelectDate={(d) => {
-              setIsDatePickerModalOpen(false)
-              setGameDate(d)
-            }}
-            handleClose={() => setIsDatePickerModalOpen(false)}
-          />
-          <MigrateStatsModal
-            isOpen={isMigrateStatsModalOpen}
-            handleClose={() => setIsMigrateStatsModalOpen(false)}
-          />
-          <SettingsModal
-            isOpen={isSettingsModalOpen}
-            handleClose={() => setIsSettingsModalOpen(false)}
-            isHardMode={isHardMode}
-            handleHardMode={handleHardMode}
-            isDarkMode={isDarkMode}
-            handleDarkMode={handleDarkMode}
-            isHighContrastMode={isHighContrastMode}
-            handleHighContrastMode={handleHighContrastMode}
-          />
-          <AlertContainer />
+            <InfoModal
+              isOpen={isInfoModalOpen}
+              handleClose={() => setIsInfoModalOpen(false)}
+            />
+            <StatsModal
+              isOpen={isStatsModalOpen}
+              handleClose={() => setIsStatsModalOpen(false)}
+              solution={solution}
+              guesses={guesses}
+              gameStats={stats}
+              isLatestGame={isLatestGame}
+              isGameLost={isGameLost}
+              isGameWon={isGameWon}
+              handleShareToClipboard={() =>
+                showSuccessAlert(GAME_COPIED_MESSAGE)
+              }
+              handleShareFailure={() =>
+                showErrorAlert(SHARE_FAILURE_TEXT, {
+                  durationMs: LONG_ALERT_TIME_MS,
+                })
+              }
+              handleMigrateStatsButton={() => {
+                setIsStatsModalOpen(false)
+                setIsMigrateStatsModalOpen(true)
+              }}
+              isHardMode={isHardMode}
+              isDarkMode={isDarkMode}
+              isHighContrastMode={isHighContrastMode}
+              numberOfGuessesMade={guesses.length}
+            />
+            <DatePickerModal
+              isOpen={isDatePickerModalOpen}
+              initialDate={solutionGameDate}
+              handleSelectDate={(d) => {
+                setIsDatePickerModalOpen(false)
+                setGameDate(d)
+              }}
+              handleClose={() => setIsDatePickerModalOpen(false)}
+            />
+            <MigrateStatsModal
+              isOpen={isMigrateStatsModalOpen}
+              handleClose={() => setIsMigrateStatsModalOpen(false)}
+            />
+            <SettingsModal
+              isOpen={isSettingsModalOpen}
+              handleClose={() => setIsSettingsModalOpen(false)}
+              isHardMode={isHardMode}
+              handleHardMode={handleHardMode}
+              isDarkMode={isDarkMode}
+              handleDarkMode={handleDarkMode}
+              isHighContrastMode={isHighContrastMode}
+              handleHighContrastMode={handleHighContrastMode}
+            />
+            <AlertContainer />
+          </div>
         </div>
-      </div>
-    </Div100vh>
+      </Div100vh>
+    </ClientGate>
   )
 }
