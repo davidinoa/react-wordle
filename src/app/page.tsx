@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Div100vh from 'react-div-100vh'
+import toast from 'react-hot-toast'
+import GraphemeSplitter from 'grapheme-splitter'
 
 import { Grid } from '@/components/grid/Grid'
 import { Keyboard } from '@/components/keyboard/Keyboard'
 import {
   DISCOURAGE_INAPP_BROWSERS,
+  DISCOURAGE_INAPP_BROWSERS_ALERT_TIME_MS,
   LONG_ALERT_TIME_MS,
   MAX_CHALLENGES,
   REVEAL_TIME_MS,
@@ -24,7 +27,6 @@ import {
   unicodeLength,
 } from '@/lib/words'
 import { addStatsForCompletedGame, loadStats } from '@/lib/stats'
-import GraphemeSplitter from 'grapheme-splitter'
 import {
   CORRECT_WORD_MESSAGE,
   DISCOURAGE_INAPP_BROWSER_TEXT,
@@ -35,7 +37,6 @@ import {
   WIN_MESSAGES,
   WORD_NOT_FOUND_MESSAGE,
 } from '@/constants/strings'
-import { useAlert } from '@/context/AlertContext'
 import {
   getStoredIsHighContrastMode,
   loadGameStateFromLocalStorage,
@@ -57,8 +58,6 @@ export default function Home() {
   const prefersDarkMode =
     isBrowserRuntime() &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
-  const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
-    useAlert()
   const [currentGuess, setCurrentGuess] = useState('')
   const [isGameWon, setIsGameWon] = useState(false)
   const [currentRowClass, setCurrentRowClass] = useState('')
@@ -75,9 +74,7 @@ export default function Home() {
     }
     if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
       setIsGameLost(true)
-      showErrorAlert(CORRECT_WORD_MESSAGE(solution), {
-        persist: true,
-      })
+      toast.error(CORRECT_WORD_MESSAGE(solution), { duration: Infinity })
     }
     return loaded.guesses
   })
@@ -119,11 +116,10 @@ export default function Home() {
   useEffect(() => {
     DISCOURAGE_INAPP_BROWSERS &&
       isInAppBrowser() &&
-      showErrorAlert(DISCOURAGE_INAPP_BROWSER_TEXT, {
-        persist: false,
-        durationMs: 7000,
+      toast.error(DISCOURAGE_INAPP_BROWSER_TEXT, {
+        duration: DISCOURAGE_INAPP_BROWSERS_ALERT_TIME_MS,
       })
-  }, [showErrorAlert])
+  }, [])
 
   useEffect(() => {
     if (isDarkMode) {
@@ -151,7 +147,7 @@ export default function Home() {
       setIsHardMode(isHard)
       localStorage.setItem('gameMode', isHard ? 'hard' : 'normal')
     } else {
-      showErrorAlert(HARD_MODE_ALERT_MESSAGE)
+      toast(HARD_MODE_ALERT_MESSAGE)
     }
   }
 
@@ -160,24 +156,19 @@ export default function Home() {
     setStoredIsHighContrastMode(isHighContrast)
   }
 
-  const clearCurrentRowClass = () => {
-    setCurrentRowClass('')
-  }
-
   useEffect(() => {
     saveGameStateToLocalStorage(getIsLatestGame(), { guesses, solution })
   }, [guesses])
 
   useEffect(() => {
     if (isGameWon) {
-      const winMessage =
-        WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)]
+      const winMessage = WIN_MESSAGES[
+        Math.floor(Math.random() * WIN_MESSAGES.length)
+      ].concat(' Come back tomorrow for another game.')
       const delayMs = REVEAL_TIME_MS * solution.length
 
-      showSuccessAlert(winMessage, {
-        delayMs,
-        onClose: () => setIsStatsModalOpen(true),
-      })
+      toast.success(winMessage)
+      setTimeout(() => setIsStatsModalOpen(true), delayMs)
     }
 
     if (isGameLost) {
@@ -185,7 +176,7 @@ export default function Home() {
         setIsStatsModalOpen(true)
       }, (solution.length + 1) * REVEAL_TIME_MS)
     }
-  }, [isGameWon, isGameLost, showSuccessAlert])
+  }, [isGameWon, isGameLost])
 
   const onChar = (value: string) => {
     if (
@@ -204,22 +195,16 @@ export default function Home() {
   }
 
   const onEnter = () => {
-    if (isGameWon || isGameLost) {
-      return
-    }
+    if (isGameWon || isGameLost) return
 
     if (!(unicodeLength(currentGuess) === solution.length)) {
       setCurrentRowClass('jiggle')
-      return showErrorAlert(NOT_ENOUGH_LETTERS_MESSAGE, {
-        onClose: clearCurrentRowClass,
-      })
+      return toast.error(NOT_ENOUGH_LETTERS_MESSAGE)
     }
 
     if (!isWordInWordList(currentGuess)) {
       setCurrentRowClass('jiggle')
-      return showErrorAlert(WORD_NOT_FOUND_MESSAGE, {
-        onClose: clearCurrentRowClass,
-      })
+      return toast.error(WORD_NOT_FOUND_MESSAGE)
     }
 
     // enforce hard mode - all guesses must contain all previously revealed letters
@@ -227,9 +212,7 @@ export default function Home() {
       const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses)
       if (firstMissingReveal) {
         setCurrentRowClass('jiggle')
-        return showErrorAlert(firstMissingReveal, {
-          onClose: clearCurrentRowClass,
-        })
+        return toast.error(firstMissingReveal)
       }
     }
 
@@ -262,9 +245,8 @@ export default function Home() {
           setStats(addStatsForCompletedGame(stats, guesses.length + 1))
         }
         setIsGameLost(true)
-        showErrorAlert(CORRECT_WORD_MESSAGE(solution), {
-          persist: true,
-          delayMs: REVEAL_TIME_MS * solution.length + 1,
+        toast.error(CORRECT_WORD_MESSAGE(solution), {
+          duration: Infinity,
         })
       }
     }
@@ -287,6 +269,7 @@ export default function Home() {
               currentGuess={currentGuess}
               isRevealing={isRevealing}
               currentRowClassName={currentRowClass}
+              onAnimationEnd={() => setCurrentRowClass('')}
             />
           </main>
           <Keyboard
@@ -310,11 +293,9 @@ export default function Home() {
             isLatestGame={isLatestGame}
             isGameLost={isGameLost}
             isGameWon={isGameWon}
-            handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}
+            handleShareToClipboard={() => toast.success(GAME_COPIED_MESSAGE)}
             handleShareFailure={() =>
-              showErrorAlert(SHARE_FAILURE_TEXT, {
-                durationMs: LONG_ALERT_TIME_MS,
-              })
+              toast.error(SHARE_FAILURE_TEXT, { duration: LONG_ALERT_TIME_MS })
             }
             handleMigrateStatsButton={() => {
               setIsStatsModalOpen(false)
